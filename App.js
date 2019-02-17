@@ -1,29 +1,36 @@
 import React from 'react';
 import {
-    StyleSheet,
-    Text,
-    View,
-    TextInput,
-    Button,
-    Image,
-    ImageBackground,
-    DrawerLayoutAndroid,
-    Picker,
-    CameraRoll
+	StyleSheet,
+	Text,
+	View,
+	Alert,
+	TextInput,
+	Button,
+	Image,
+	ImageBackground,
+	DrawerLayoutAndroid,
+	Picker,
+	CameraRoll, Modal
 } from 'react-native';
+import ExpenseView from "./src/components/Expense/ExpenseView";
+import ExpenseList from "./src/components/Expense/ExpenseList";
+import AddExpenseForm from "./src/components/Expense/AddExpenseForm";
 
 export default class App extends React.Component {
+
     constructor(props) {
         super(props);
 
         this.state = {
             value: 0,
-            isRuning: false
+            isRuning: false,
+	        isModalOpen: false,
+	        expenses: []
         }
     }
 
     render() {
-        const {value, isRuning} = this.state;
+    	const { expenses, isModalOpen } = this.state;
         const navigationView = (
             <View style={styles.container}>
                 <Text style={{margin: 10, fontSize: 15, textAlign: 'left'}}>Choose your desteny</Text>
@@ -40,60 +47,79 @@ export default class App extends React.Component {
             <DrawerLayoutAndroid
                 drawerWidth={300}
                 drawerPosition={DrawerLayoutAndroid.positions.Left}
-                renderNavigationView={() => navigationView}>
-            <ImageBackground style={styles.scretch} source={require('./imgs/one.jpg')}>
-            <View style={styles.container}>
-                <Text>Hey, freak!</Text>
-                <View>
-                    <Text style={styles.value}>{value}</Text>
-                </View>
-                {/*<TextInput onChangeText={(text) => this.setState({value: text}) }/>*/}
-                <Button
-                    title={isRuning ? 'Stop me' : 'Kick me'}
-                    onPress={isRuning ? this.handleStop : this.handleRun}
-                />
-            </View>
-        </ImageBackground>
-        </DrawerLayoutAndroid>
+                renderNavigationView={() => navigationView}
+            >
+	            <ImageBackground style={styles.scretch} source={require('./imgs/one.jpg')}>
+		            <View style={styles.container}>
+			            <Button title={'Add expense'} onPress={this.handleOpenModal} />
+			            <ExpenseList expenses={expenses} />
+			            <Modal
+				            animationType="slide"
+				            transparent={false}
+				            visible={isModalOpen}
+				            onRequestClose={() => {
+					            //Alert.alert('Modal has been closed.');
+					            this.handleCloseModal();
+				            }}
+			            >
+				            <AddExpenseForm onInputChange={this.handleInputChange} />
+				            <View style={{ marginBottom: 20 }}>
+					            <Button
+						            title={'Cancel'}
+						            onPress={this.handleCloseModal}
+						            color={'#f31f17'}
+					            />
+				            </View>
+				            <Button title={'Add expense'} onPress={this.handleAddExpense}  />
+			            </Modal>
+			            {/*<ExpenseView
+				            title={'First expense'}
+				            tag={'all'}
+				            count={1200}
+				            source={'cash'}
+			            />*/}
+		            </View>
+	            </ImageBackground>
+	        </DrawerLayoutAndroid>
         );
     }
 
-    handleRun = () => {
-        this.setState({isRuning: true});
-        this.interval = setInterval(() => this.setState(({value}) => ({value: value + 1})), 995)
-    };
+	handleAddExpense = () => {
+    	this.setState({
+		    expenses: [{
+		    	title: this.state.title,
+			    data: [
+				    this.state.count,
+				    this.state.tag,
+				    this.state.source
+			    ]
+		    }].concat(this.state.expenses)
+	    });
+    	this.handleCloseModal();
+	};
 
-    handleStop = () => {
-        this.setState({isRuning: false});
-        clearInterval(this.interval);
-    };
+	handleInputChange = field => ev => {
+        this.setState({ [field]: ev.nativeEvent.text })
+	};
 
-    handlePress = () => {
-        alert(this.state.value)
-    }
+	handleOpenModal = ev => {
+		this.setState({ isModalOpen: true })
+	};
 
-    handleCameraRoll = () => {
-        CameraRoll.getPhotos({
-            first: 20,
-            assetType: 'Photos',
-        })
-            .then(r => {
-                this.setState({ photos: r.edges });
-            })
-            .catch((err) => {
-                //Error Loading Images
-            });
-    };
+	handleCloseModal = () => {
+    	this.setState({ isModalOpen: false })
+	}
 
 }
 
 const styles = StyleSheet.create({
   container: {
+  	paddingTop: 50,
     flex: 1,
     backgroundColor: '#ff007d',
     alignItems: 'center',
     justifyContent: 'center',
-    opacity: 0.7
+    opacity: 0.7,
   },
   value: {
       fontSize: 50

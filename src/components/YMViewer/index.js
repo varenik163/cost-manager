@@ -23,9 +23,9 @@ class YMViewer extends Component {
 	render() {
 		const {list} = this.props;
 
-		return <Fragment>
+		return <View>
 
-		</Fragment>
+		</View>
 	}
 }
 
