@@ -15,6 +15,11 @@ import {
 import ExpenseView from "./src/components/Expense/ExpenseView";
 import ExpenseList from "./src/components/Expense/ExpenseList";
 import AddExpenseForm from "./src/components/Expense/AddExpenseForm";
+import db from './firebase'
+
+const addItem = item => {
+	db.ref('/expenses').push(item);
+};
 
 export default class App extends React.Component {
 
@@ -85,6 +90,10 @@ export default class App extends React.Component {
     }
 
 	handleAddExpense = () => {
+    	const { title, count, tag, source } = this.state;
+    	addItem({
+		    title, count, tag, source
+	    });
     	this.setState({
 		    expenses: [{
 		    	title: this.state.title,
