@@ -26,12 +26,14 @@ class ExpenseList extends Component {
 
 		return <View style={styles.container}>
 			<SectionList
-				renderItem={({item, index, section}) => <Text style={styles.item} key={index}>
-					<Text style={{fontWeight: 'bold'}}>
-						{index === 0 ? 'Count: ' : index === 1 ? 'Category: ' : 'Source: '}
+				renderItem={({item, index, section}) => (
+					<Text style={styles.item} key={index}>
+						<Text style={{fontWeight: 'bold'}}>
+							{index === 0 ? 'Count: ' : index === 1 ? 'Category: ' : 'Source: '}
+						</Text>
+						{item}
 					</Text>
-					{item}
-				</Text>}
+				)}
 				renderSectionHeader={({section: {title}}) => (
 					<Text style={styles.title}>{title}</Text>
 				)}
@@ -50,7 +52,7 @@ const styles = StyleSheet.create({
 	item: {
 		padding: 10,
 		height: 44,
-		backgroundColor: '#94ffff',
+		backgroundColor: '#f9fff6',
 		width: 300,
 		marginBottom: 5
 	},

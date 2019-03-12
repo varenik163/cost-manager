@@ -15,37 +15,41 @@ import {
 	Modal
 } from 'react-native';
 
+const inputStyle = { height: 40, marginBottom: 10};
+const labelStyle = { fontWeight: 'bold' };
+
 class AddExpenseForm extends Component {
-
-	componentDidMount() {
-
-	}
 
 	render() {
 		const { onInputChange } = this.props;
 
 		return <View style={{padding: 10}}>
+			<Text style={labelStyle}>Title</Text>
 			<TextInput
-				style={{height: 40}}
-				placeholder="Type title here"
+				style={inputStyle}
+				placeholder="milk"
+				label='Title'
 				onChange={onInputChange('title')}
 				name={'title'}
 			/>
+			<Text style={labelStyle}>Tag</Text>
 			<TextInput
-				style={{height: 40}}
-				placeholder="Type tag here"
+				style={inputStyle}
+				placeholder="food"
 				onChange={onInputChange('tag')}
 				name={'tag'}
 			/>
+			<Text style={labelStyle}>Amount</Text>
 			<TextInput
-				style={{height: 40}}
-				placeholder="Type count here"
+				style={inputStyle}
+				placeholder="56"
 				onChange={onInputChange('count')}
 				name={'count'}
 			/>
+			<Text style={labelStyle}>Source</Text>
 			<TextInput
-				style={{height: 40}}
-				placeholder="Type source here"
+				style={inputStyle}
+				placeholder="cash/card sber"
 				onChange={onInputChange('source')}
 				name={'source'}
 			/>

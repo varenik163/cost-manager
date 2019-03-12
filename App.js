@@ -12,7 +12,6 @@ import {
 	Picker,
 	CameraRoll, Modal
 } from 'react-native';
-import ExpenseView from "./src/components/Expense/ExpenseView";
 import ExpenseList from "./src/components/Expense/ExpenseList";
 import AddExpenseForm from "./src/components/Expense/AddExpenseForm";
 import db from './firebase'
@@ -30,21 +29,51 @@ export default class App extends React.Component {
             value: 0,
             isRuning: false,
 	        isModalOpen: false,
-	        expenses: []
+	        expenses: [],
+	        scheme: ''
         }
     }
 
+    componentDidMount() {
+	    db.ref('/expenses').orderByKey().on('value', data => {
+	    	const value = data.val();
+	    	if (!value) return;
+
+	    	const expenses = Object.keys(value).map(key => value.hasOwnProperty(key) ? value[key] : null )
+			    .filter(e => e);
+
+	    	this.setState({ expenses })
+	    });
+    }
+
     render() {
-    	const { expenses, isModalOpen } = this.state;
+    	const { expenses, isModalOpen, scheme } = this.state;
+	    const styles = StyleSheet.create({
+		    container: {
+			    paddingTop: 50,
+			    flex: 1,
+			    backgroundColor: scheme || 'transparent',
+			    alignItems: 'center',
+			    justifyContent: 'center',
+			    opacity: 0.7,
+		    },
+		    value: {
+			    fontSize: 50
+		    },
+		    scretch: {
+			    flex: 1,
+		    }
+	    });
         const navigationView = (
             <View style={styles.container}>
-                <Text style={{margin: 10, fontSize: 15, textAlign: 'left'}}>Choose your desteny</Text>
+                <Text style={{margin: 10, fontSize: 15, textAlign: 'left'}}>Switch color scheme</Text>
                 <Picker
-                    selectedValue={this.state.language}
+                    selectedValue={this.state.scheme}
                     style={{ height: 50, width: 100 }}
-                    onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
-                    <Picker.Item label="Burn in Hell" value="java" />
-                    <Picker.Item label="Fuck 'till death in your ass" value="js" />
+                    onValueChange={(itemValue, itemIndex) => this.setState({scheme: itemValue})}>
+                    <Picker.Item label="chill" value="#ff007d" />
+                    <Picker.Item label="white" value="#000000" />
+                    <Picker.Item label="default" value="" />
                 </Picker>
             </View>
         );
@@ -56,11 +85,13 @@ export default class App extends React.Component {
             >
 	            <ImageBackground style={styles.scretch} source={require('./imgs/one.jpg')}>
 		            <View style={styles.container}>
-			            <Button title={'Add expense'} onPress={this.handleOpenModal} />
-			            <ExpenseList expenses={expenses} />
+			            {!isModalOpen && <View>
+				            <Button title={'Add expense'} onPress={this.handleOpenModal} />
+				            <ExpenseList expenses={expenses} />
+			            </View>}
 			            <Modal
 				            animationType="slide"
-				            transparent={false}
+				            transparent={true}
 				            visible={isModalOpen}
 				            onRequestClose={() => {
 					            //Alert.alert('Modal has been closed.');
@@ -68,21 +99,22 @@ export default class App extends React.Component {
 				            }}
 			            >
 				            <AddExpenseForm onInputChange={this.handleInputChange} />
-				            <View style={{ marginBottom: 20 }}>
-					            <Button
-						            title={'Cancel'}
-						            onPress={this.handleCloseModal}
-						            color={'#f31f17'}
-					            />
+				            <View style={{
+					            flexWrap: 'wrap',
+					            alignItems: 'flex-start',
+					            justifyContent: 'center',
+					            flexDirection:'row',
+				            }}>
+					            <View style={{marginRight: 20}}>
+						            <Button
+							            title={'Cancel'}
+							            onPress={this.handleCloseModal}
+							            color={'#f31f17'}
+						            />
+					            </View>
+				                <Button title={'Add expense'} onPress={this.handleAddExpense}  />
 				            </View>
-				            <Button title={'Add expense'} onPress={this.handleAddExpense}  />
 			            </Modal>
-			            {/*<ExpenseView
-				            title={'First expense'}
-				            tag={'all'}
-				            count={1200}
-				            source={'cash'}
-			            />*/}
 		            </View>
 	            </ImageBackground>
 	        </DrawerLayoutAndroid>
@@ -91,18 +123,18 @@ export default class App extends React.Component {
 
 	handleAddExpense = () => {
     	const { title, count, tag, source } = this.state;
-    	addItem({
-		    title, count, tag, source
-	    });
+		const newItem = {
+			title: this.state.title,
+			data: [
+				this.state.count,
+				this.state.tag,
+				this.state.source
+			]
+		};
+
+    	addItem(newItem);
     	this.setState({
-		    expenses: [{
-		    	title: this.state.title,
-			    data: [
-				    this.state.count,
-				    this.state.tag,
-				    this.state.source
-			    ]
-		    }].concat(this.state.expenses)
+		    expenses: [newItem].concat(this.state.expenses)
 	    });
     	this.handleCloseModal();
 	};
@@ -120,20 +152,3 @@ export default class App extends React.Component {
 	}
 
 }
-
-const styles = StyleSheet.create({
-  container: {
-  	paddingTop: 50,
-    flex: 1,
-    backgroundColor: '#ff007d',
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0.7,
-  },
-  value: {
-      fontSize: 50
-  },
-  scretch: {
-      flex: 1,
-  }
-});
