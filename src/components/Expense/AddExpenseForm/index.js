@@ -23,7 +23,7 @@ class AddExpenseForm extends Component {
 	render() {
 		const { onInputChange } = this.props;
 
-		return <View style={{padding: 10}}>
+		return <View style={{ padding: 10, marginTop: 50 }}>
 			<Text style={labelStyle}>Title</Text>
 			<TextInput
 				style={inputStyle}
